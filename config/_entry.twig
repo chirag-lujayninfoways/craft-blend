@@ -1,0 +1,84 @@
+{% filter mjml %}
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-class name="outlet" font-size="12px" line-height="15px" color="#B57C4E" font-weight="500" padding="0" letter-spacing="1px" text-transform="uppercase" />
+      <mj-class name="title" font-size="21px" line-height="22px" color="#000" font-family="'Playfair Display'" font-weight="600" padding="4px 4px 4px 0" />
+      <mj-class name="scoreCol" width="15%" padding="0" />
+      <mj-class name="titleCol" width="85%" padding="0" />
+      <mj-class name="fullCol" width="100%" padding="0" />
+      <mj-class name="sectionWrap" padding="24px" border="1px solid #E1E1E1" border-radius="4px" />
+      <mj-class name="bodyText" font-size="14px" line-height="19px" color="#484848" font-family="'Lato'" font-weight="400" padding="8px 0 0 0" />
+      <mj-class name="sectionHead" font-size="24px" line-height="24px" color="#B57C4E" font-family="'Lato'" font-weight="600" letter-spacing="2px" padding="0" align="center" />
+      <mj-class name="sectionUnder" padding="4px 0 4px 0" border-style="solid" border-color="#C3A9A9" border-width="2px" />
+      <mj-class name="promoBlock" padding="6px 0 0 0" line-height="18px" font-size="13px" />
+      <mj-class name="divider" padding="16px 0 0 0" border-style="dotted" border-color="#C3A9A9" border-width="2px" />
+      <mj-class name="sectionPad" padding="14px 0 0 0" />
+    </mj-attributes>
+    <mj-style> .scoreTop { background-color: #B57C4E; color: #fff; font-size: 12px; line-height: 14px; font-family: 'Lato'; text-align: center; padding-top: 4px; border-radius: 4px 4px 0 0; } .scoreBottom { background-color: #B57C4E; color: #fff; font-size: 20px; line-height: 20px; font-family: 'Playfair Display'; text-align: center; font-weight: 800; padding-bottom: 8px; border-radius: 0 0 4px 4px; } .buyLink { font-weight: 600; color: #E15526; text-decoration: none; } .readMore { color:#000; font-weight:600; } strong { color:#000; font-size: 18px;} .bodyLink {color: #E15526; font-size: 16px; font-family: ''Lato''; font-weight: 800;} .smallHead {display: block; padding-top: 4px; font-size: 16px; font-weight: 800; color: #B57C4E;} em {font-weight: 800};</mj-style>
+  </mj-head>
+  <mj-body>
+  <mj-wrapper mj-class="sectionWrap">
+      <mj-section padding="0">
+        <mj-column>
+          <mj-text mj-class="sectionHead"> REVIEWS </mj-text>
+          <mj-divider mj-class="sectionUnder"></mj-divider>
+          <mj-image src="https://cdn1.blindmanspuff.com/wp-content/uploads/2021/01/Blind-Cigar-Review-Crowned-Heads-Mil-Dias-Edmundo-1-890x267.jpg" padding="0" />
+        </mj-column>
+      </mj-section>
+         {% set reviews = craft.entries()
+         .section('cigarReviews')
+         .publishedDate('>=' ~ entry.coverageStartDate|atom)
+         .publishedDate('<=' ~ entry.coverageEndDate|atom)
+         .orderBy('publishedDate asc')
+         %}
+{# .coverageStartDate('<= '~ publishedDate|date).coverageEndDate('>= '~ publishedDate|date).orderBy('publishedDate desc') #}
+   {% for review in reviews %}
+    {% set pubDate = review.publishedDate|date('m/d') %}
+{#       {% if pubDate > entry.coverageStartDate|date('m/d') and pubDate < entry.coverageEndDate|date('m/d') %} #}
+      <mj-section mj-class="sectionPad">
+          <mj-group>
+          <mj-column mj-class="titleCol">
+            <mj-text mj-class="outlet"> {{ review.Outlet }} - {{ pubDate }}  </mj-text>
+            <mj-text mj-class="title">{{ review.title }}</mj-text>
+          </mj-column>
+          <mj-column mj-class="scoreCol">
+            <mj-table padding="0">
+              <tr align="center">
+                <td class="scoreTop"> Score: </td>
+              </tr>
+              <tr align="center">
+                <td class="scoreBottom"> {{ review.reviewScore }} </td>
+              </tr>
+            </mj-table>
+          </mj-column>
+        </mj-group>
+      </mj-section>
+      <mj-section padding="0">
+        <mj-column padding="0">
+        {% set shortcut = craft.shortcut.get({ url: 'https://cnn.com' }) %}
+          <mj-text mj-class="bodyText">{{ review.Summary }}&nbsp;&nbsp;<a href="TEST.com" class="readMore">Read More</a>
+          </mj-text>
+          {% if review.Shopping.exists() %}
+            <mj-text mj-class="promoBlock"> <span> {{ review.stock }} @ 
+          {% for block in review.Shopping %}
+           <a href="{{ block.productLink }}" class="buyLink">{{ block.retailerName }}</a>
+           {% if not loop.last %} / {% endif %}
+          {% endfor %}
+           </span> </mj-text>
+        {% endif %}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      {% if not loop.last %}
+       <mj-section padding="0">
+        <mj-column padding="0">
+          <mj-divider mj-class="divider"></mj-divider>
+        </mj-column>
+      </mj-section>
+    {% endif %}
+{#     {% endif %} #}
+  {% endfor %}
+  </mj-body>
+</mjml>
+{% endfilter %}
